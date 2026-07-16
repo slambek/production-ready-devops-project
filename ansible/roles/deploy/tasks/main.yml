@@ -43,3 +43,12 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
     mode: "0755"
+
+- name: Create production environment file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ deploy_directory }}/.env"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: "0600"
+  no_log: true

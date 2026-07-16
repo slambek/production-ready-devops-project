@@ -15,3 +15,9 @@ postgres_user: devops_user
 application_port: 8080
 grafana_port: 3000
 prometheus_port: 9090
+
+postgres_password: "{{ vault_postgres_password }}"
+grafana_admin_user: admin
+grafana_admin_password: "{{ vault_grafana_admin_password }}"
+
+database_url: "postgresql+psycopg2://{{ postgres_user }}:{{ postgres_password }}@postgres:5432/{{ postgres_db }}"

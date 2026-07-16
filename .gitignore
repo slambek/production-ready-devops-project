@@ -6,3 +6,4 @@ __pycache__
 .idea
 *.pyc
 ansible/inventory/hosts.ini
+ansible/inventory/lima-ssh.conf
