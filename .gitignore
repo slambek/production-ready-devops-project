@@ -7,3 +7,4 @@ __pycache__
 *.pyc
 ansible/inventory/hosts.ini
 ansible/inventory/lima-ssh.conf
+k8s/base/secret.env
