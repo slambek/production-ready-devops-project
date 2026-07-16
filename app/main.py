@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
-from starlette.responses import Response
+
+from app.database import check_database_connection
 
 app = FastAPI(
     title="Production Ready DevOps Project",
@@ -21,9 +22,26 @@ def health() -> dict[str, str]:
     return {"status": "healthy"}
 
 
-@app.get("/ready")
-def readiness() -> dict[str, str]:
-    return {"status": "ready"}
+@app.get(
+    "/ready",
+    responses={
+        503: {
+            "description": "Database is unavailable",
+        }
+    },
+)
+def readiness(response: Response) -> dict[str, str]:
+    if not check_database_connection():
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {
+            "status": "not ready",
+            "database": "unavailable",
+        }
+
+    return {
+        "status": "ready",
+        "database": "available",
+    }
 
 
 @app.get("/metrics")

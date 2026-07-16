@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -22,11 +24,30 @@ def test_health() -> None:
     assert response.json() == {"status": "healthy"}
 
 
-def test_readiness() -> None:
+@patch("app.main.check_database_connection", return_value=True)
+def test_readiness_when_database_is_available(mock_database_check) -> None:
     response = client.get("/ready")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ready"}
+    assert response.json() == {
+        "status": "ready",
+        "database": "available",
+    }
+
+    mock_database_check.assert_called_once()
+
+
+@patch("app.main.check_database_connection", return_value=False)
+def test_readiness_when_database_is_unavailable(mock_database_check) -> None:
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "status": "not ready",
+        "database": "unavailable",
+    }
+
+    mock_database_check.assert_called_once()
 
 
 def test_metrics() -> None:
