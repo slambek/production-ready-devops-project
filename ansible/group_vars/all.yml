@@ -1,0 +1,17 @@
+project_name: production-ready-devops-project
+deploy_user: deploy
+deploy_group: deploy
+
+deploy_root: /opt/production-ready-devops-project
+deploy_directory: "{{ deploy_root }}/deploy"
+monitoring_directory: "{{ deploy_root }}/monitoring"
+nginx_directory: "{{ deploy_root }}/docker/nginx"
+
+app_image: ghcr.io/slambek/production-ready-devops-project:latest
+
+postgres_db: devops_db
+postgres_user: devops_user
+
+application_port: 8080
+grafana_port: 3000
+prometheus_port: 9090

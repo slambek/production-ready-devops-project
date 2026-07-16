@@ -1,0 +1,9 @@
+---
+- name: Configure and deploy DevOps portfolio application
+  hosts: app_servers
+  become: true
+
+  roles:
+    - role: common
+    - role: docker
+    - role: deploy
