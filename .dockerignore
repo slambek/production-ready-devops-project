@@ -1,0 +1,13 @@
+.git
+.github
+.venv
+.pytest_cache
+__pycache__
+*.pyc
+.env
+docs
+terraform
+ansible
+monitoring
+tests
+README.md
