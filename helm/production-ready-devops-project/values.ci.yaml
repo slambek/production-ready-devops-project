@@ -1,0 +1,5 @@
+postgres:
+  password: ci-test-password
+
+ingress:
+  host: devops-ci.local

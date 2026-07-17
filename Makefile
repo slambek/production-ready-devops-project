@@ -41,3 +41,10 @@ clean:
 helm-lint:
 	helm lint helm/production-ready-devops-project \
 		-f helm/production-ready-devops-project/values.local.yaml
+
+helm-template:
+	helm template devops \
+		helm/production-ready-devops-project \
+		--namespace devops-ci \
+		-f helm/production-ready-devops-project/values.ci.yaml \
+		> /tmp/devops-manifests.yaml

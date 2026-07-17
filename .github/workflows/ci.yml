@@ -47,7 +47,9 @@ jobs:
   docker:
     name: Build and publish Docker image
     runs-on: ubuntu-latest
-    needs: test
+    needs:
+      - test
+      - helm
 
     steps:
       - name: Checkout repository
@@ -82,3 +84,41 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  helm:
+    name: Validate Helm chart
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: latest
+
+      - name: Lint Helm chart
+        run: |
+          helm lint \
+            helm/production-ready-devops-project \
+            -f helm/production-ready-devops-project/values.ci.yaml \
+            --strict
+
+      - name: Render Kubernetes manifests
+        run: |
+          helm template devops \
+            helm/production-ready-devops-project \
+            --namespace devops-ci \
+            -f helm/production-ready-devops-project/values.ci.yaml \
+            > /tmp/devops-manifests.yaml
+
+      - name: Verify rendered manifests
+        run: |
+          test -s /tmp/devops-manifests.yaml
+          grep -q "kind: Deployment" /tmp/devops-manifests.yaml
+          grep -q "kind: Service" /tmp/devops-manifests.yaml
+          grep -q "kind: Ingress" /tmp/devops-manifests.yaml
+          grep -q "kind: HorizontalPodAutoscaler" /tmp/devops-manifests.yaml
+          grep -q "kind: PodDisruptionBudget" /tmp/devops-manifests.yaml
+          grep -q "kind: NetworkPolicy" /tmp/devops-manifests.yaml
