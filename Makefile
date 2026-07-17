@@ -48,3 +48,10 @@ helm-template:
 		--namespace devops-ci \
 		-f helm/production-ready-devops-project/values.ci.yaml \
 		> /tmp/devops-manifests.yaml
+
+kubeconform: helm-template
+	kubeconform \
+		-strict \
+		-summary \
+		-kubernetes-version 1.35.1 \
+		/tmp/devops-manifests.yaml

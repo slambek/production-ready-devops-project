@@ -113,6 +113,24 @@ jobs:
             -f helm/production-ready-devops-project/values.ci.yaml \
             > /tmp/devops-manifests.yaml
 
+      - name: Install kubeconform
+        run: |
+          curl -sSLo kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-linux-amd64.tar.gz
+
+          tar -xzf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/kubeconform
+
+          kubeconform -v
+
+      - name: Validate Kubernetes schemas
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.35.1 \
+            /tmp/devops-manifests.yaml
+
       - name: Verify rendered manifests
         run: |
           test -s /tmp/devops-manifests.yaml
