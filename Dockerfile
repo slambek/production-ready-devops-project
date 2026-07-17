@@ -17,13 +17,21 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN groupadd --system appgroup \
-    && useradd --system --gid appgroup appuser
+RUN groupadd \
+        --gid 1000 \
+        appgroup \
+    && useradd \
+        --uid 1000 \
+        --gid appgroup \
+        --create-home \
+        --shell /usr/sbin/nologin \
+        appuser
 
 COPY --from=builder /install /usr/local
-COPY app ./app
 
-USER appuser
+COPY --chown=1000:1000 app ./app
+
+USER 1000:1000
 
 EXPOSE 8000
 

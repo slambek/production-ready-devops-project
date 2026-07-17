@@ -25,10 +25,25 @@ spec:
         app.kubernetes.io/part-of: production-ready-devops-project
 
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
       containers:
         - name: app
           image: ghcr.io/slambek/production-ready-devops-project:latest
           imagePullPolicy: Always
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
 
           ports:
             - name: http
@@ -87,6 +102,14 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+
+      volumes:
+        - name: tmp
+          emptyDir: {}
 
 ---
 apiVersion: v1
