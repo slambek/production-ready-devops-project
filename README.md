@@ -6,22 +6,9 @@ A production-ready DevOps practice project built around a FastAPI application. T
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    Developer --> GitHub
-    GitHub --> Actions[GitHub Actions]
-    Actions --> Tests
-    Actions --> Security
-    Actions --> Build[Docker Buildx]
-    Build --> GHCR
-    GHCR --> DockerCompose
-    GHCR --> Kubernetes
-    Ansible --> DockerCompose
-    Kubernetes --> App
-    App --> PostgreSQL
-    Prometheus --> App
-    Grafana --> Prometheus
-```
+<p align="center">
+  <img src="assets/architecture.png" alt="Architecture Diagram" width="85%">
+</p>
 
 ## Tech Stack
 
