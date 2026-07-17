@@ -14,6 +14,8 @@ repos:
       - id: check-yaml
         args:
           - --allow-multiple-documents
+        exclude: ^helm/.*/templates/
+
       - id: check-toml
       - id: end-of-file-fixer
       - id: trailing-whitespace

@@ -37,3 +37,7 @@ logs:
 clean:
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
 	rm -rf .pytest_cache .ruff_cache
+
+helm-lint:
+	helm lint helm/production-ready-devops-project \
+		-f helm/production-ready-devops-project/values.local.yaml

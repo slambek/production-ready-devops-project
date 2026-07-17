@@ -1,0 +1,15 @@
+apiVersion: v2
+name: production-ready-devops-project
+description: Production-ready FastAPI platform with PostgreSQL and Kubernetes resources
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - fastapi
+  - postgres
+  - devops
+  - kubernetes
+
+maintainers:
+  - name: Alimkhan
