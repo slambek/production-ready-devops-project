@@ -19,25 +19,45 @@ metadata:
     app.kubernetes.io/part-of: production-ready-devops-project
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       app.kubernetes.io/name: postgres
+
   strategy:
     type: Recreate
+
   template:
     metadata:
       labels:
         app.kubernetes.io/name: postgres
         app.kubernetes.io/part-of: production-ready-devops-project
+
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+
       containers:
         - name: postgres
           image: postgres:17-alpine
           imagePullPolicy: IfNotPresent
 
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
           ports:
             - name: postgres
               containerPort: 5432
+              protocol: TCP
 
           env:
             - name: POSTGRES_DB
@@ -58,9 +78,18 @@ spec:
                   name: app-secrets
                   key: POSTGRES_PASSWORD
 
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+
+            - name: postgres-runtime
+              mountPath: /var/run/postgresql
+
+            - name: postgres-tmp
+              mountPath: /tmp
 
           readinessProbe:
             exec:
@@ -97,6 +126,12 @@ spec:
           persistentVolumeClaim:
             claimName: postgres-data
 
+        - name: postgres-runtime
+          emptyDir: {}
+
+        - name: postgres-tmp
+          emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
@@ -106,9 +141,12 @@ metadata:
     app.kubernetes.io/name: postgres
 spec:
   type: ClusterIP
+
   selector:
     app.kubernetes.io/name: postgres
+
   ports:
     - name: postgres
       port: 5432
       targetPort: postgres
+      protocol: TCP

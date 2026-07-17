@@ -24,22 +24,41 @@ metadata:
     app.kubernetes.io/component: postgres
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       {{- include "devops-project.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: postgres
+
   strategy:
     type: Recreate
+
   template:
     metadata:
       labels:
         {{- include "devops-project.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: postgres
+
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+
       containers:
         - name: postgres
           image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
           imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
 
           ports:
             - name: postgres
@@ -64,6 +83,21 @@ spec:
                 secretKeyRef:
                   name: {{ include "devops-project.fullname" . }}-secret
                   key: POSTGRES_PASSWORD
+
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          volumeMounts:
+            {{- if .Values.postgres.persistence.enabled }}
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            {{- end }}
+
+            - name: postgres-runtime
+              mountPath: /var/run/postgresql
+
+            - name: postgres-tmp
+              mountPath: /tmp
 
           readinessProbe:
             exec:
@@ -90,18 +124,18 @@ spec:
           resources:
             {{- toYaml .Values.postgres.resources | nindent 12 }}
 
-          {{- if .Values.postgres.persistence.enabled }}
-          volumeMounts:
-            - name: postgres-data
-              mountPath: /var/lib/postgresql/data
-          {{- end }}
-
-      {{- if .Values.postgres.persistence.enabled }}
       volumes:
+        {{- if .Values.postgres.persistence.enabled }}
         - name: postgres-data
           persistentVolumeClaim:
             claimName: {{ include "devops-project.fullname" . }}-postgres
-      {{- end }}
+        {{- end }}
+
+        - name: postgres-runtime
+          emptyDir: {}
+
+        - name: postgres-tmp
+          emptyDir: {}
 
 ---
 apiVersion: v1
@@ -113,9 +147,11 @@ metadata:
     app.kubernetes.io/component: postgres
 spec:
   type: ClusterIP
+
   selector:
     {{- include "devops-project.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: postgres
+
   ports:
     - name: postgres
       port: 5432
