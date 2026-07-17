@@ -8,3 +8,4 @@ __pycache__
 ansible/inventory/hosts.ini
 ansible/inventory/lima-ssh.conf
 k8s/base/secret.env
+helm/production-ready-devops-project/values.local.yaml
