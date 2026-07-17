@@ -55,3 +55,10 @@ kubeconform: helm-template
 		-summary \
 		-kubernetes-version 1.35.1 \
 		/tmp/devops-manifests.yaml
+
+security:
+	trivy fs \
+		--scanners vuln,secret,misconfig \
+		--severity HIGH,CRITICAL \
+		--ignore-unfixed \
+		.
