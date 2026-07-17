@@ -7,6 +7,9 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - postgres.yaml
+  - app.yaml
+  - ingress.yaml
+  - hpa.yaml
 
 secretGenerator:
   - name: app-secrets
@@ -16,5 +19,6 @@ secretGenerator:
 generatorOptions:
   disableNameSuffixHash: true
 
-commonLabels:
-  app.kubernetes.io/managed-by: kustomize
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: kustomize
