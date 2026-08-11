@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/architecture.png" alt="Architecture" width="85%">
+</p>
+
 FastAPI + PostgreSQL project with Docker, GitHub Actions, Kubernetes, Helm and Ansible.
 
 ## Run locally
